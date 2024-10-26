@@ -14,7 +14,12 @@ const app = express();
 app.use(bodyParser.json());
 // Set up CORS  
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000', credentials: true }));
+const allowedOrigins = ['https://dashing-parfait-fb2515.netlify.app'];
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true, // if you need to allow credentials (cookies, authorization headers)
+}));
 
 //API Routes
 app.use('/api', route);
