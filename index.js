@@ -15,21 +15,13 @@ const port = process.env.PORT || 5001; // Use the provided PORT or default to 50
 app.use(bodyParser.json());
 
 // Set up CORS
-const allowedOrigins = [
-    'http://localhost:3000',  // Local development
-    'https://dashing-parfait-fb2515.netlify.app' // Production
-];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-}));
+const corsOptions = {
+    origin: 'https://dashing-parfait-fb2515.netlify.app', // Update this to your frontend's URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  };
+  
+  app.use(cors(corsOptions));
 
 // API Routes
 app.use('/api', route);
