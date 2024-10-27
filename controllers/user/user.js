@@ -135,7 +135,7 @@ const login = async (req, res) => {
             return;
         }
         // Create a JWT token
-        const token = jwt.sign({ userId: user._id }, 'secret_key', { expiresIn: '1d' });
+        const token = jwt.sign({ userId: user._id }, 'secret_key', { expiresIn: '30d' });
 
         res.status(200).setHeader('Authorization', `Bearer${token}`).json({ token: token, user });
     } catch (error) {
