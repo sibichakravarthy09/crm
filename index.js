@@ -8,31 +8,25 @@ const path = require('path');
 require('dotenv').config();
 
 // Set up Express app
-const port = process.env.PORT;
 const app = express();
-
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
-});
-
+const port = process.env.PORT; // Use Render-provided PORT
 
 // Middleware
 app.use(bodyParser.json());
 
 // Set up CORS
 app.use(cors({
-    origin: '*', // Temporarily allow all origins
+    origin: 'https://dashing-parfait-fb2515.netlify.app', // Replace with the frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 }));
 
-
 // API Routes
 app.use('/api', route);
 
 // Root endpoint
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
     res.send('Welcome to my world...');
 });
 
@@ -56,7 +50,6 @@ app.get('/', async (req, res) => {
 const server = app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
-
 
 // Connect to MongoDB
 const DATABASE_URL = process.env.DB_URL;
