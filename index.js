@@ -8,8 +8,13 @@ const path = require('path');
 require('dotenv').config();
 
 // Set up Express app
+const port = process.env.PORT;
 const app = express();
-const port = process.env.PORT || 5001; // Use the provided PORT or default to 5001
+
+app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
+});
+
 
 // Middleware
 app.use(bodyParser.json());
@@ -49,11 +54,9 @@ app.get('/', async (req, res) => {
 
 // Start the server
 const server = app.listen(port, () => {
-    const protocol = (process.env.HTTPS === 'true' || process.env.NODE_ENV === 'production') ? 'https' : 'http';
-    const { address } = server.address();
-    const host = address === '::' ? '127.0.0.1' : address;
-    console.log(`Server listening at ${protocol}://${host}:${port}`);
+    console.log(`Server listening on port ${port}`);
 });
+
 
 // Connect to MongoDB
 const DATABASE_URL = process.env.DB_URL;
