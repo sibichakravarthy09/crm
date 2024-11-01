@@ -64,16 +64,24 @@ function SignIn() {
     try {
       setIsLoading(true);
       const response = await postApi('/user/login', values, checkBox);
+      
       if (response?.status === 200) {
         toast.success("Login Successfully!");
         navigate('/admin');
         resetForm();
       } else {
-        toast.error(response?.response?.data?.error || "Login Failed");
+        const errorMessage = response?.data?.error || "Login Failed. Please try again.";
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("An error occurred during login.");
+      console.error("Login error:", error);
+      if (error.response) {
+        toast.error(error.response.data?.error || "An error occurred during login.");
+      } else if (error.request) {
+        toast.error("No response from the server. Please check your network connection.");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

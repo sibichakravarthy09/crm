@@ -1,34 +1,36 @@
 import axios from "axios";
-import { constant } from "constant"; // Make sure to adjust this import path if necessary
+import { constant } from "constant"; // Ensure the path is correct
+
+// Helper function to set token and user data in storage
+const saveTokenAndUser = (token, user, login) => {
+    if (token) {
+        if (login) {
+            localStorage.setItem("token", token);
+        } else {
+            sessionStorage.setItem("token", token);
+        }
+        localStorage.setItem("user", JSON.stringify(user));
+    }
+};
 
 // Function to get authorization headers
-const getAuthHeaders = () => ({
-    headers: {
-        Authorization: localStorage.getItem("token") || sessionStorage.getItem("token"),
-    },
-});
+const getAuthHeaders = () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
 
-// POST request function
-export const postApi = async (path, data, login) => {
+// POST request function for login
+export const postApi = async (path, data, login = true) => {
     try {
-        // Update the path in the API call to match your backend
-const result = await axios.post(`${constant.baseUrl}/api/user/login`, data, getAuthHeaders());
-
-
+        const result = await axios.post(`${constant.baseUrl}${path}`, data, getAuthHeaders());
+        
         // Save the token and user data if present
-        if (result.data?.token) {
-            if (login) {
-                localStorage.setItem('token', result.data.token);
-            } else {
-                sessionStorage.setItem('token', result.data.token);
-            }
-            localStorage.setItem('user', JSON.stringify(result.data.user));
-        }
-
+        saveTokenAndUser(result.data?.token, result.data?.user, login);
+        
         return result;
     } catch (e) {
-        console.error(e.response ? e.response.data : e.message);
-        return e.response ? e.response.data : e;
+        console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
+        return e.response?.data || e;
     }
 };
 
@@ -38,24 +40,24 @@ export const putApi = async (path, data) => {
         const result = await axios.put(`${constant.baseUrl}${path}`, data, getAuthHeaders());
         return result;
     } catch (e) {
-        console.error(e.response ? e.response.data : e.message);
-        return e.response ? e.response.data : e;
+        console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
+        return e.response?.data || e;
     }
 };
 
 // DELETE request function (single item)
 export const deleteApi = async (path, id) => {
     try {
-        const result = await axios.delete(`${constant.baseUrl}${path}${id}`, getAuthHeaders());
+        const result = await axios.delete(`${constant.baseUrl}${path}/${id}`, getAuthHeaders());
         
-        // Save the token if present
+        // Save token if present
         if (result.data?.token) {
-            localStorage.setItem('token', result.data.token);
+            localStorage.setItem("token", result.data.token);
         }
         return result;
     } catch (e) {
-        console.error(e.response ? e.response.data : e.message);
-        return e.response ? e.response.data : e;
+        console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
+        return e.response?.data || e;
     }
 };
 
@@ -63,15 +65,15 @@ export const deleteApi = async (path, id) => {
 export const deleteManyApi = async (path, data) => {
     try {
         const result = await axios.post(`${constant.baseUrl}${path}`, data, getAuthHeaders());
-
-        // Save the token if present
+        
+        // Save token if present
         if (result.data?.token) {
-            localStorage.setItem('token', result.data.token);
+            localStorage.setItem("token", result.data.token);
         }
         return result;
     } catch (e) {
-        console.error(e.response ? e.response.data : e.message);
-        return e.response ? e.response.data : e;
+        console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
+        return e.response?.data || e;
     }
 };
 
@@ -81,7 +83,7 @@ export const getApi = async (path, id = '') => {
         const result = await axios.get(`${constant.baseUrl}${path}${id}`, getAuthHeaders());
         return result;
     } catch (e) {
-        console.error(e.response ? e.response.data : e.message);
-        return e.response ? e.response.data : e;
+        console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
+        return e.response?.data || e;
     }
 };
