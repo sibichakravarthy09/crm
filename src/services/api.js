@@ -22,15 +22,23 @@ const getAuthHeaders = () => {
 // POST request function for login
 export const postApi = async (path, data, login = true) => {
     try {
-        const result = await axios.post(`${constant.baseUrl}${path}`, data, getAuthHeaders());
+        // Construct the URL properly
+        const url = `${constant.baseURL}${path.startsWith('/') ? '' : '/'}${path}`;
         
-        // Save the token and user data if present
-        saveTokenAndUser(result.data?.token, result.data?.user, login);
-        
+        // Perform the POST request
+        const result = await axios.post(url, data, {
+            headers: getAuthHeaders(),
+            withCredentials: constant.withCredentials, // Use withCredentials if needed
+        });
+
+        // Save token and user data if present
+        if (login) saveTokenAndUser(result.data?.token, result.data?.user, login);
+
         return result;
     } catch (e) {
+        // Log detailed error
         console.error(`Error ${e.response?.status}:`, e.response?.data || e.message);
-        return e.response?.data || e;
+        throw e.response?.data || e;
     }
 };
 

@@ -1,4 +1,4 @@
 export const constant = {
-    baseUrl: 'https://crm-xd7y.onrender.com'
-    
+    baseURL: "http://localhost:10000/api",
+    withCredentials: true,
 }
