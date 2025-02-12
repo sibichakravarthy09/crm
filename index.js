@@ -5,55 +5,57 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+const userRoutes = require('./controllers/user/_routes'); // Adjust this path as necessary
 
-// Set up Express app
+// Initialize Express app
 const app = express();
-const port = process.env.PORT || 10000; // Default to port 3000 if PORT is not set
+const port = process.env.PORT || 10000; // Use environment variable PORT, fallback to 10000
 
 // Middleware
-app.use(bodyParser.json());
-
-// Set up CORS with enhanced headers for debugging
-
-
+app.use(bodyParser.json()); // Parse incoming JSON requests
 
 const corsOptions = {
-  origin: ['https://dashing-parfait-fb2515.netlify.app', 'http://localhost:3000'], // Add your Netlify URL here
-  credentials: true,
+  origin: ['https://your-frontend-site.netlify.app', 'http://localhost:3000'], // List of allowed origins
+  credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
 };
 
+// Apply CORS settings globally
 app.use(cors(corsOptions));
 
-// API Routes
-app.use('/api', route);
+// Routes
+app.use('/user', userRoutes); // User-related routes
+app.use('/api', route); // General API routes
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Welcome to my world...');
 });
 
-// Start the server with enhanced error handling
-const server = app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-}).on('error', (err) => {
-  console.error('Failed to start server:', err);
-});
-
-// Connect to MongoDB
-const DATABASE_URL = process.env.DB_URL;
-const DATABASE = process.env.DB;
-
-// Call the database connection function
-db(DATABASE_URL, DATABASE)
-  .then(() => console.log('Database connection successful'))
-  .catch((error) => console.error('Database connection error:', error));
-
-// Enhanced route and error handling
+// Enhanced error handling for undefined routes
 app.use((req, res, next) => {
   res.status(404).send({ error: 'Not Found' }); // Handle 404 errors
 });
 
+// Global error handler for unexpected errors
 app.use((err, req, res, next) => {
-  console.error('Server error:', err); // Log server errors for debugging
+  console.error('Server error:', err); // Log the error for debugging
   res.status(500).send({ error: 'Internal Server Error' });
+});
+
+// Database Connection
+const DATABASE_URL = process.env.DB_URL;
+const DATABASE = process.env.DB;
+
+// Connect to the database
+db(DATABASE_URL, DATABASE)
+  .then(() => console.log('Database connection successful'))
+  .catch((error) => console.error('Database connection error:', error));
+
+// Start the server with error handling
+const server = app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+}).on('error', (err) => {
+  console.error('Failed to start server:', err); // Log server startup errors
 });
