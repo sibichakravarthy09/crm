@@ -1,4 +1,4 @@
-const express = require('express'); 
+const express = require('express');  
 const db = require('./db/config');
 const route = require('./controllers/route');
 const bodyParser = require('body-parser');
@@ -25,6 +25,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`Blocked CORS request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -36,17 +37,23 @@ const corsOptions = {
 // Apply CORS settings globally
 app.use(cors(corsOptions));
 
+// Handle CORS preflight requests properly
+app.options('*', cors(corsOptions));
+
 // Ensure CORS headers in all responses
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || '*');
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
 
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200); // Handle preflight requests
+    return res.sendStatus(204); // Respond to preflight requests with 204 No Content
   }
-  
+
   next();
 });
 
@@ -85,4 +92,3 @@ const server = app.listen(port, () => {
 }).on('error', (err) => {
   console.error('Failed to start server:', err.message);
 });
-
