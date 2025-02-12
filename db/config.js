@@ -16,8 +16,8 @@ const connectDB = async (DATABASE_URL, DATABASE) => {
             const phoneNumber = 7874263694
             const firstName = 'Sibi'
             const lastName = 'emperor'
-            const username = 'admin@gmail.com'
-            const password = 'admin123'
+            const username = 'admin123@gmail.com'
+            const password = 'admin12345'
             // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
             // Create a new user
